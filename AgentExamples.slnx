@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AgentesFlow/AgentesFlow.csproj" />
+    <Project Path="src/AgentSkills/AgentSkills.csproj" />
+    <Project Path="src/DeveloperAgent/DeveloperAgent.csproj" />
+    <Project Path="src/FoundryToolkit/FoundryToolkit.csproj" />
+  </Folder>
+
+</Solution>
