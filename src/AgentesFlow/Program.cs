@@ -82,7 +82,7 @@ AIAgent publisher = agentFactory.Create(
 
 WorkflowFactory workflowFactory = new WorkflowFactory();
 
-
+bool reviewerApproved = false;
 Workflow workflow = workflowFactory.Create(
     writer,
     builder =>
@@ -95,7 +95,7 @@ Workflow workflow = workflowFactory.Create(
             condition: message =>
             {
                 if (message is TurnToken)
-                    return true;
+                    return reviewerApproved == false;
 
                 if (message is not List<ChatMessage> messages)
                     return false;
@@ -103,10 +103,10 @@ Workflow workflow = workflowFactory.Create(
                 ChatMessage? reviewerMessage = messages.LastOrDefault(m => m.AuthorName == "Reviewer");
 
                 string? text = reviewerMessage?.Text?.Trim();
-
-                return text?.Contains(
-                     "REJECTED",
-                     StringComparison.OrdinalIgnoreCase) == true;
+                var rejected = text?.Contains("REJECTED", StringComparison.OrdinalIgnoreCase) == true;
+                if (rejected)
+                    reviewerApproved = false;
+                return rejected;
 
             });
 
@@ -116,16 +116,18 @@ Workflow workflow = workflowFactory.Create(
              condition: message =>
              {
                  if (message is TurnToken)
-                     return true;
+                     return reviewerApproved == true;
 
                  if (message is not List<ChatMessage> messages)
                      return false;
 
                  ChatMessage? reviewerMessage = messages.LastOrDefault(m => m.AuthorName == "Reviewer");
-
+                 
                  string? text = reviewerMessage?.Text?.Trim();
-
-                 return text?.TrimStart().StartsWith("APPROVED", StringComparison.OrdinalIgnoreCase) == true;
+                 var approved = text?.Contains("APPROVED", StringComparison.OrdinalIgnoreCase) == true;
+                 if (approved)
+                     reviewerApproved = true;
+                 return approved;
              });
 
         builder.WithOutputFrom(publisher);
