@@ -9,13 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AgentFrameworkToolkit.Tools" Version="1.24.2" />
-    <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.24.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+    <PackageReference Include="AgentFrameworkToolkit.Tools"/>
+    <PackageReference Include="Microsoft.Agents.AI.OpenAI"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets"/>
   </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\FoundryToolkit\FoundryToolkit.csproj" />
+		<ProjectReference Include="..\FoundryToolkit\FoundryToolkit.csproj"/>
 	</ItemGroup>
 
 </Project>
