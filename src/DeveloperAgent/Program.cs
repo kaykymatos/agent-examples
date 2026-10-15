@@ -2,6 +2,7 @@ using Azure.AI.Projects;
 using Azure.Identity;
 using DotNetEnv;
 using FoundryToolkit.Agents;
+using FoundryToolkit.Shared;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.Configuration;
 
@@ -42,10 +43,6 @@ AIAgent agent = agentFactory.Create(
 
 Console.WriteLine("Iniciando o agente...");
 Console.WriteLine("Digite uma pergunta ou comando para o agente:");
-while (true)
-{
-    Console.Write("> ");
-    string input = Console.ReadLine();
-    AgentResponse response = await agent.RunAsync(input);
-    Console.WriteLine(response);
-}
+
+AgentSession session = await agent.CreateSessionAsync();
+await Utils.RunChatLoopWithSession(agent, session);
