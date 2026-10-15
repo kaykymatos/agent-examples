@@ -152,6 +152,7 @@ await using StreamingRun run = await InProcessExecution.RunStreamingAsync(
 
 await run.TrySendMessageAsync(new TurnToken(emitEvents: true));
 string currentAgent = string.Empty;
+
 await foreach (WorkflowEvent evt in run.WatchStreamAsync())
 {
     if (evt is WorkflowOutputEvent outputEvent)

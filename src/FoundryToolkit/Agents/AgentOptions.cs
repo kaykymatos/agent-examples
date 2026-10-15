@@ -1,4 +1,7 @@
-﻿namespace FoundryToolkit.Agents;
+﻿using Microsoft.Agents.AI;
+using Microsoft.Extensions.AI;
+
+namespace FoundryToolkit.Agents;
 
 public sealed class AgentOptions
 {
@@ -7,4 +10,5 @@ public sealed class AgentOptions
     public required string Model { get; init; }
 
     public required string Instructions { get; init; }
+    public IList<string>? SkillPaths { get; init; }
 }

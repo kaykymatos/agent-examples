@@ -1,5 +1,6 @@
 ﻿using Azure.AI.Projects;
 using Microsoft.Agents.AI;
+using Microsoft.Extensions.AI;
 
 namespace FoundryToolkit.Agents;
 
@@ -20,10 +21,28 @@ public sealed class AgentFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(options.Model);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.Instructions);
 
+        var skills = new List<AIContextProvider>();
+        if (options.SkillPaths is not null && options.SkillPaths.Count > 0)
+            foreach (var item in options.SkillPaths)
+                skills.Add(new AgentSkillsProvider(item, options: new AgentSkillsProviderOptions
+                {
+                    DisableReadSkillResourceApproval = true,
+                    DisableRunSkillScriptApproval = true,
+                    DisableLoadSkillApproval = true,
+                }));
+        
         return _projectClient.AsAIAgent(
-            model: options.Model,
-            name: options.Name,
-            instructions: options.Instructions
+            new ChatClientAgentOptions
+            {
+                Name = options.Name,
+
+                ChatOptions = new()
+                {
+                    ModelId = options.Model,
+                    Instructions = options.Instructions
+                },
+                AIContextProviders = skills,
+            }
         );
     }
 }

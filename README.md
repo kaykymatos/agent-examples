@@ -1,153 +1,133 @@
-# Microsoft Foundry Agent with C#
+# Exemplos de agentes com Microsoft Foundry e .NET
 
-A simple C# console application that creates an AI agent using Microsoft Foundry and the Microsoft Agent Framework.
+Este repositório reúne exemplos de aplicações de console em C# que usam modelos implantados no Microsoft Foundry e o Microsoft Agent Framework. Os projetos demonstram agentes com instruções próprias, conversas com histórico, skills e fluxos de trabalho com mais de um agente.
 
-The agent receives questions in the console and generates responses based on its configured instructions.
+## Projetos
 
-## Prerequisites
-
-Before running the project, make sure you have:
-
-- The .NET SDK version required by the project.
-- An Azure subscription and access to a Microsoft Foundry project.
-- A deployed model in your Foundry project.
-- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed and signed in.
-- The project source code cloned to your machine.
-
-## 1. Sign in to Azure
-
-Because the application uses `AzureCliCredential`, authenticate through Azure CLI:
-
-```bash
-az login
-```
-
-If you have access to multiple subscriptions, select the one containing your Foundry project:
-
-```bash
-az account set --subscription "<YOUR_SUBSCRIPTION_ID>"
-```
-
-Make sure your account has the permissions required to access the Foundry project and its deployed model.
-
-## 2. Get your Microsoft Foundry project endpoint
-
-1. Open [Microsoft Foundry](https://ai.azure.com/).
-2. Open the project you want to use.
-3. Find the project's endpoint in its project details or connection information.
-4. Copy the project endpoint URL.
-
-Use the **project endpoint**, not the model's public documentation URL. The exact location of the endpoint in the portal may vary as the interface evolves.
-
-## 3. Get your model deployment name
-
-In your Foundry project, open the model deployments page and copy the name of the deployed model you want to use.
-
-Use the **deployment name** configured in your project. It may differ from the model's catalog name.
-
-## 4. Configure the application
-
-The application reads these settings:
-
-| Setting | Description |
+| Projeto | O que é |
 | --- | --- |
-| `FOUNDRY_PROJECT_ENDPOINT` | The endpoint URL of your Microsoft Foundry project. |
-| `AZURE_AI_MODEL_DEPLOYMENT_NAME` | The name of your deployed model. |
+| [`DeveloperAgent`](src/DeveloperAgent/DeveloperAgent.csproj) | Um agente de desenvolvimento C# que responde em português e mantém o contexto da conversa. |
+| [`AgentSkills`](src/AgentSkills/AgentSkills.csproj) | Um agente conversacional que recebe skills descritas em arquivos `SKILL.md`; inclui uma skill de pirata como exemplo. |
+| [`AgentesFlow`](src/AgentesFlow/AgentesFlow.csproj) | Um fluxo de três agentes: um escritor cria uma frase, um revisor aprova ou pede correções e um publicador simula a publicação. |
+| [`FoundryToolkit`](src/FoundryToolkit/FoundryToolkit.csproj) | Biblioteca compartilhada pelos exemplos, com fábricas de agentes e workflows, suporte a skills e utilitário de conversa com sessão. Não é uma aplicação executável. |
 
-You can provide them through environment variables or .NET User Secrets.
+## Requisitos
 
-### Option A: Environment variables
+- .NET SDK 10.
+- Uma assinatura Azure e um projeto no [Microsoft Foundry](https://ai.azure.com/).
+- Um modelo implantado nesse projeto.
+- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli), autenticado com uma conta que tenha acesso ao projeto e ao modelo.
 
-Set the variables in your terminal before running the application.
+## Configuração
 
-**PowerShell (Windows):**
+Todos os aplicativos precisam do endpoint do projeto Foundry e do nome da implantação do modelo. O código lê estas configurações:
+
+| Chave | Valor |
+| --- | --- |
+| `FOUNDRY_PROJECT_ENDPOINT` | Endpoint do projeto no Microsoft Foundry — não a URL da página do portal nem a URL do catálogo do modelo. |
+| `AZURE_AI_MODEL_DEPLOYMENT_NAME` | Nome da implantação do modelo no projeto Foundry. |
+
+Autentique-se com a Azure CLI e, se necessário, selecione a assinatura correta:
 
 ```powershell
-$env:FOUNDRY_PROJECT_ENDPOINT = "https://<YOUR-FOUNDRY-PROJECT-ENDPOINT>"
-$env:AZURE_AI_MODEL_DEPLOYMENT_NAME = "<YOUR-MODEL-DEPLOYMENT-NAME>"
-dotnet run
+az login
+az account set --subscription "<ID-DA-SUBSCRICAO>"
 ```
 
-Replace both placeholder values with your actual project endpoint and deployment name.
+### Usando variáveis de ambiente
 
-These commands set the variables only for the current PowerShell session.
+No PowerShell, configure as variáveis na mesma janela em que executará o exemplo:
 
-**Bash (Linux/macOS):**
-
-```bash
-export FOUNDRY_PROJECT_ENDPOINT="https://<YOUR-FOUNDRY-PROJECT-ENDPOINT>"
-export AZURE_AI_MODEL_DEPLOYMENT_NAME="<YOUR-MODEL-DEPLOYMENT-NAME>"
-dotnet run
+```powershell
+$env:FOUNDRY_PROJECT_ENDPOINT = "https://<ENDPOINT-DO-PROJETO>"
+$env:AZURE_AI_MODEL_DEPLOYMENT_NAME = "<NOME-DA-IMPLANTACAO>"
 ```
 
-### Option B: .NET User Secrets (recommended for local development)
+### Usando .NET User Secrets
 
-The application calls `AddUserSecrets<Program>(optional: true)`, so you can store these settings in User Secrets instead of adding them to source control.
+Os projetos de aplicação já têm um `UserSecretsId`. A partir da raiz do repositório, configure os valores para um dos projetos:
 
-Run these commands from the directory containing the application project's `.csproj` file:
-
-```bash
-dotnet user-secrets init
-dotnet user-secrets set "FOUNDRY_PROJECT_ENDPOINT" "https://<YOUR-FOUNDRY-PROJECT-ENDPOINT>"
-dotnet user-secrets set "AZURE_AI_MODEL_DEPLOYMENT_NAME" "<YOUR-MODEL-DEPLOYMENT-NAME>"
+```powershell
+dotnet user-secrets set "FOUNDRY_PROJECT_ENDPOINT" "https://<ENDPOINT-DO-PROJETO>" --project src\DeveloperAgent\DeveloperAgent.csproj
+dotnet user-secrets set "AZURE_AI_MODEL_DEPLOYMENT_NAME" "<NOME-DA-IMPLANTACAO>" --project src\DeveloperAgent\DeveloperAgent.csproj
 ```
 
-Replace the placeholder values with your actual settings. User Secrets are intended for local development and are not encrypted; do not treat them as a production secret store.
+Os três aplicativos compartilham o mesmo `UserSecretsId`, portanto esses valores também serão usados por `AgentSkills` e `AgentesFlow`. User Secrets são apropriados para desenvolvimento local; não são criptografados e não devem ser tratados como um cofre de produção.
 
-### Option C: `.env` file
+### Usando um arquivo `.env`
 
-The code calls `DotNetEnv` to load environment variables from a `.env` file. If you prefer this option, create a `.env` file in a location that `DotNetEnv` can discover:
+Também é possível criar um arquivo `.env` na raiz do repositório:
 
 ```dotenv
-FOUNDRY_PROJECT_ENDPOINT=https://<YOUR-FOUNDRY-PROJECT-ENDPOINT>
-AZURE_AI_MODEL_DEPLOYMENT_NAME=<YOUR-MODEL-DEPLOYMENT-NAME>
+FOUNDRY_PROJECT_ENDPOINT=https://<ENDPOINT-DO-PROJETO>
+AZURE_AI_MODEL_DEPLOYMENT_NAME=<NOME-DA-IMPLANTACAO>
 ```
 
-Do not commit `.env` files containing private configuration or credentials. Add `.env` to `.gitignore`.
+Os aplicativos procuram esse arquivo ao percorrer os diretórios acima da aplicação. O `.gitignore` já ignora arquivos `.env`; não remova essa proteção nem versione configurações privadas. Como User Secrets são adicionados depois das variáveis de ambiente na configuração .NET, eles prevalecem quando a mesma chave está definida em ambos.
 
-> **Configuration precedence:** the code uses `AddEnvironmentVariables()` before `AddUserSecrets<Program>()`. With the default .NET configuration providers, later providers override earlier providers, so User Secrets override environment variables when both define the same key. The `.env` loader also populates environment variables; behavior can depend on whether those variables already exist and on the `DotNetEnv` loading options.
+## Como executar
 
-## 5. Run the application
+Execute os comandos a partir da raiz do repositório. Restaure as dependências uma vez:
 
-From the directory containing the console application's `.csproj` file:
-
-```bash
-dotnet restore
-dotnet run
+```powershell
+dotnet restore AgentExamples.slnx
 ```
 
-When the application starts, enter a question or instruction in the console. The agent will respond using the deployed model and the instructions configured in the code.
+Depois escolha um projeto:
 
-To stop the application, press `Ctrl+C`.
+### `DeveloperAgent` — agente desenvolvedor
 
-## How it works
+```powershell
+dotnet run --project src\DeveloperAgent\DeveloperAgent.csproj
+```
 
-At a high level, the application:
+Converse no terminal com um agente configurado para atuar como desenvolvedor C# sênior. Ele responde em português, explica decisões técnicas e ajuda a identificar e corrigir erros. A conversa mantém uma sessão; digite `/new` para iniciar outra sessão.
 
-1. Loads configuration from environment variables and .NET User Secrets.
-2. Creates an `AIProjectClient` using `AzureCliCredential`.
-3. Uses `AgentFactory` and `AgentOptions` to configure an agent named `Writer`.
-4. Sends user input to the agent with `RunAsync`.
-5. Prints the response in the console.
+### `AgentSkills` — agente com skills
 
-## Troubleshooting
+```powershell
+dotnet run --project src\AgentSkills\AgentSkills.csproj
+```
 
-- **Missing endpoint or deployment name:** confirm that both configuration keys are set correctly.
-- **Authentication errors:** run `az login` again and verify that the signed-in account has access to the Azure resource.
-- **Access denied:** check the permissions assigned to your account for the Foundry project and model.
-- **Deployment not found:** confirm that the deployment name exactly matches the name in your Foundry project.
-- **Invalid endpoint:** make sure you copied the project endpoint, not a portal page URL or a model catalog URL.
+Este exemplo cria um agente conversacional com as instruções e skills encontradas no diretório `src\AgentSkills\Skills`. A skill incluída, `speak-like-a-pirate`, define uma persona de pirata amigável para crianças. Peça ao agente para usar essa persona ou faça outras perguntas.
 
-## Security
+Para adicionar uma skill, crie um subdiretório dentro de `src\AgentSkills\Skills` com um arquivo `SKILL.md`. Inclua metadados `name` e `description` no início do arquivo e descreva no corpo as instruções da skill. O agente recebe as skills encontradas no diretório configurado pelo exemplo.
 
-- Never commit credentials, access tokens, or private configuration to source control.
-- Keep `.env` files out of Git.
-- Use .NET User Secrets for local development and an appropriate secure configuration service for deployed applications.
+### `AgentesFlow` — fluxo de agentes
 
-## Technologies
+```powershell
+dotnet run --project src\AgentesFlow\AgentesFlow.csproj
+```
 
-- C#
-- .NET
-- Microsoft Foundry
-- Azure Identity
-- Microsoft Agent Framework
+Digite um tema quando solicitado. O fluxo então:
+
+1. Pede ao `Writer` uma frase sobre o tema.
+2. Envia a frase ao `Reviewer`, que a aprova ou pede uma correção.
+3. Em caso de rejeição, devolve o feedback ao `Writer` e repete a revisão.
+4. Após a aprovação, envia a frase ao `Publisher`, que simula sua publicação.
+
+O resultado de cada agente é exibido no terminal. Pressione `Ctrl+C` para interromper os aplicativos interativos.
+
+## Biblioteca compartilhada: `FoundryToolkit`
+
+Os exemplos usam essa biblioteca para compartilhar componentes:
+
+- `AgentFactory` cria agentes ligados ao projeto Foundry, com modelo, nome, instruções e, opcionalmente, diretórios de skills.
+- `WorkflowFactory` cria workflows do Microsoft Agent Framework.
+- `Utils.RunChatLoopWithSession` executa o loop de conversa e permite iniciar uma nova sessão com `/new`.
+- O namespace `FoundryToolkit.Skills` contém contratos e estruturas para registrar e executar skills (`ISkill`, `SkillContext` e `SkillRegistry`).
+
+## Solução
+
+Os quatro projetos estão incluídos em [`AgentExamples.slnx`](AgentExamples.slnx). Para compilar a solução sem executar uma aplicação:
+
+```powershell
+dotnet build AgentExamples.slnx
+```
+
+## Problemas comuns
+
+- **Endpoint ou modelo ausente:** confira os nomes das chaves e os valores configurados. User Secrets podem prevalecer sobre variáveis de ambiente.
+- **Falha de autenticação ou acesso negado:** execute `az login` e confirme que a conta tem acesso ao projeto Foundry e à implantação.
+- **Implantação não encontrada:** use o nome exato da implantação do modelo, que pode ser diferente do nome do modelo no catálogo.
+- **Endpoint inválido:** copie o endpoint do projeto Foundry, não a URL do portal nem a página do modelo.
