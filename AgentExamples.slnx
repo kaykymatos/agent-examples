@@ -3,6 +3,7 @@
   <Folder Name="/src/">
     <Project Path="src/AgentesFlow/AgentesFlow.csproj" />
     <Project Path="src/AgentSkills/AgentSkills.csproj" />
+    <Project Path="src/AgentWithTools/AgentWithTools.csproj" Id="016d566b-543d-447c-bad3-50672ad499cf" />
     <Project Path="src/DeveloperAgent/DeveloperAgent.csproj" />
     <Project Path="src/FoundryToolkit/FoundryToolkit.csproj" />
   </Folder>

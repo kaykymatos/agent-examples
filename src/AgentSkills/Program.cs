@@ -3,13 +3,8 @@ using Azure.Identity;
 using DotNetEnv;
 using FoundryToolkit.Agents;
 using FoundryToolkit.Shared;
-using FoundryToolkit.Skills;
-using Google.Protobuf;
 using Microsoft.Agents.AI;
-using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
-using OpenAI.Chat;
-using System.IO;
 
 
 Env.NoClobber().TraversePath().Load();
@@ -29,7 +24,7 @@ AgentFactory agentFactory = new AgentFactory(
 
 string skillsPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "AgentSkills", "Skills"));
 
-var skillsProvider = new FoundryToolkit.Skills.AgentSkillsProvider(skillsPath);
+FoundryToolkit.Skills.AgentSkillsProvider skillsProvider = new FoundryToolkit.Skills.AgentSkillsProvider(skillsPath);
 
 AgentOptions options = new AgentOptions
 {
