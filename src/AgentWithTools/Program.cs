@@ -27,7 +27,7 @@ AgentFactory agentFactory = new AgentFactory(
     new AzureCliCredential()));
 
 
-var reportTools = new AITool[]
+AITool[] reportTools = new AITool[]
 {
     AIFunctionFactory.Create(ReportTools.GenerateSalesExcel, "GerarExcelVendas", "Gera uma planilha Excel com dados de vendas e retorna o caminho do arquivo."),
     AIFunctionFactory.Create(ReportTools.GenerateSummaryPdf, "GerarPdfResumo", "Gera um documento PDF resumido com um título e conteúdo fornecidos.")
@@ -55,7 +55,7 @@ AIAgent agent = agentFactory.Create(
         Tools = reportTools
     });
 
-var session = await agent.CreateSessionAsync();
+AgentSession session = await agent.CreateSessionAsync();
 
 Console.WriteLine("Iniciando o agente...");
 Console.WriteLine("Digite uma pergunta ou comando para o agente:");

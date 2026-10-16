@@ -13,9 +13,9 @@ namespace AgentWithTools.Tools
         {
             string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "AgentGeneratedReport.xlsx");
 
-            using var workbook = new XLWorkbook();
+            using XLWorkbook workbook = new XLWorkbook();
 
-            var worksheet = workbook.Worksheets.Add("Report");
+            IXLWorksheet worksheet = workbook.Worksheets.Add("Report");
 
             for (int column = 0; column < columns.Length; column++)
                 worksheet.Cell(1, column + 1).Value = columns[column];
