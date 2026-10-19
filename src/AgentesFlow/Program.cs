@@ -160,8 +160,13 @@ await foreach (WorkflowEvent evt in run.WatchStreamAsync())
         if (outputEvent.ExecutorId != currentAgent)
         {
             currentAgent = outputEvent.ExecutorId;
+            Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine($"\n[{currentAgent}]: ");
+            Console.ResetColor();
         }
+
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.Write(outputEvent.Data);
     }
 }
+Console.ResetColor();

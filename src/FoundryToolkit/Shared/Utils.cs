@@ -18,8 +18,10 @@ namespace FoundryToolkit.Shared
                     continue;
                 }
 
+                Console.ForegroundColor = ConsoleColor.Green;
                 await foreach (AgentResponseUpdate update in agent.RunStreamingAsync(input, session))
                     Console.Write(update);
+                Console.ResetColor();
             }
         }
     }
