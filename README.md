@@ -7,7 +7,8 @@ Este repositório reúne exemplos de aplicações de console em C# que usam mode
 | Projeto | O que é |
 | --- | --- |
 | [`DeveloperAgent`](src/DeveloperAgent/DeveloperAgent.csproj) | Um agente de desenvolvimento C# que responde em português e mantém o contexto da conversa. |
-| [`AgentSkills`](src/AgentSkills/AgentSkills.csproj) | Um agente conversacional que recebe skills descritas em arquivos `SKILL.md`; inclui uma skill de pirata como exemplo. |
+| [`AgentSkills`](src/AgentSkills/AgentSkills.csproj) | Um agente conversacional que recebe skills descritas em arquivos `SKILL.md`; inclui exemplos de persona e transformação de texto. |
+| [`AgentWithTools`](src/AgentWithTools/AgentWithTools.csproj) | Um agente que usa ferramentas para gerar planilhas Excel e relatórios PDF. |
 | [`AgentesFlow`](src/AgentesFlow/AgentesFlow.csproj) | Um fluxo de três agentes: um escritor cria uma frase, um revisor aprova ou pede correções e um publicador simula a publicação. |
 | [`FoundryToolkit`](src/FoundryToolkit/FoundryToolkit.csproj) | Biblioteca compartilhada pelos exemplos, com fábricas de agentes e workflows, suporte a skills e utilitário de conversa com sessão. Não é uma aplicação executável. |
 
@@ -52,7 +53,7 @@ dotnet user-secrets set "FOUNDRY_PROJECT_ENDPOINT" "https://<ENDPOINT-DO-PROJETO
 dotnet user-secrets set "AZURE_AI_MODEL_DEPLOYMENT_NAME" "<NOME-DA-IMPLANTACAO>" --project src\DeveloperAgent\DeveloperAgent.csproj
 ```
 
-Os três aplicativos compartilham o mesmo `UserSecretsId`, portanto esses valores também serão usados por `AgentSkills` e `AgentesFlow`. User Secrets são apropriados para desenvolvimento local; não são criptografados e não devem ser tratados como um cofre de produção.
+Os quatro aplicativos compartilham o mesmo `UserSecretsId`, portanto esses valores também serão usados por `AgentSkills`, `AgentWithTools` e `AgentesFlow`. User Secrets são apropriados para desenvolvimento local; não são criptografados e não devem ser tratados como um cofre de produção.
 
 ### Usando um arquivo `.env`
 
@@ -91,7 +92,35 @@ dotnet run --project src\AgentSkills\AgentSkills.csproj
 
 Este exemplo cria um agente conversacional com as instruções e skills encontradas no diretório `src\AgentSkills\Skills`. A skill incluída, `speak-like-a-pirate`, define uma persona de pirata amigável para crianças. Peça ao agente para usar essa persona ou faça outras perguntas.
 
-Para adicionar uma skill, crie um subdiretório dentro de `src\AgentSkills\Skills` com um arquivo `SKILL.md`. Inclua metadados `name` e `description` no início do arquivo e descreva no corpo as instruções da skill. O agente recebe as skills encontradas no diretório configurado pelo exemplo.
+As skills disponíveis neste exemplo são:
+
+| Skill | Descrição |
+| --- | --- |
+| `speak-like-a-pirate` | Responde com a persona de um pirata amigável para crianças, preservando o sentido do texto. |
+| `uppercase-formatter` | Converte o texto para maiúsculas e adiciona o prefixo `[PROCESSADO]:`. |
+
+Para adicionar uma skill, crie um subdiretório dentro de `src\AgentSkills\Skills` com um arquivo `SKILL.md`. O arquivo deve começar com metadados `name` e `description` em YAML e descrever no corpo as instruções da skill:
+
+```markdown
+---
+name: nome-da-skill
+description: Resumo de quando e como usar a skill.
+---
+
+# Instruções
+
+Descreva aqui o comportamento esperado.
+```
+
+O agente recebe as skills encontradas no diretório configurado pelo exemplo. Você pode pedir, por exemplo, para reescrever uma frase como pirata ou formatar um texto em maiúsculas.
+
+### `AgentWithTools` — agente com ferramentas de geração de documentos
+
+```powershell
+dotnet run --project src\AgentWithTools\AgentWithTools.csproj
+```
+
+Converse com o agente para solicitar uma planilha Excel ou um relatório PDF. Ele pode gerar uma planilha com título, colunas, dados, filtros e opções de formatação; o PDF pode incluir parágrafos e uma tabela opcional. Os arquivos são salvos na pasta `Downloads` do usuário atual. O projeto usa ClosedXML para Excel e QuestPDF para PDF; o QuestPDF está configurado com a licença Community.
 
 ### `AgentesFlow` — fluxo de agentes
 
@@ -119,7 +148,7 @@ Os exemplos usam essa biblioteca para compartilhar componentes:
 
 ## Solução
 
-Os quatro projetos estão incluídos em [`AgentExamples.slnx`](AgentExamples.slnx). Para compilar a solução sem executar uma aplicação:
+Os cinco projetos estão incluídos em [`AgentExamples.slnx`](AgentExamples.slnx). Para compilar a solução sem executar uma aplicação:
 
 ```powershell
 dotnet build AgentExamples.slnx
