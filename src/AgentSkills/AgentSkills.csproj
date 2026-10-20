@@ -10,7 +10,6 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Agents.AI.Foundry.Hosting" />
 		<PackageReference Include="Azure.AI.Projects" />
 		<PackageReference Include="DotNetEnv" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />

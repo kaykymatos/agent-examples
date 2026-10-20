@@ -103,7 +103,7 @@ Workflow workflow = workflowFactory.Create(
                 ChatMessage? reviewerMessage = messages.LastOrDefault(m => m.AuthorName == "Reviewer");
 
                 string? text = reviewerMessage?.Text?.Trim();
-                var rejected = text?.Contains("REJECTED", StringComparison.OrdinalIgnoreCase) == true;
+                bool rejected = text?.Contains("REJECTED", StringComparison.OrdinalIgnoreCase) == true;
                 if (rejected)
                     reviewerApproved = false;
                 return rejected;
@@ -122,9 +122,9 @@ Workflow workflow = workflowFactory.Create(
                      return false;
 
                  ChatMessage? reviewerMessage = messages.LastOrDefault(m => m.AuthorName == "Reviewer");
-                 
+
                  string? text = reviewerMessage?.Text?.Trim();
-                 var approved = text?.Contains("APPROVED", StringComparison.OrdinalIgnoreCase) == true;
+                 bool approved = text?.Contains("APPROVED", StringComparison.OrdinalIgnoreCase) == true;
                  if (approved)
                      reviewerApproved = true;
                  return approved;
@@ -160,8 +160,13 @@ await foreach (WorkflowEvent evt in run.WatchStreamAsync())
         if (outputEvent.ExecutorId != currentAgent)
         {
             currentAgent = outputEvent.ExecutorId;
+            Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine($"\n[{currentAgent}]: ");
+            Console.ResetColor();
         }
+
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.Write(outputEvent.Data);
     }
 }
+Console.ResetColor();

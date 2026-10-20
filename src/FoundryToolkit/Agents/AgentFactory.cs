@@ -21,16 +21,16 @@ public sealed class AgentFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(options.Model);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.Instructions);
 
-        var skills = new List<AIContextProvider>();
+        List<AIContextProvider> skills = new List<AIContextProvider>();
         if (options.SkillPaths is not null && options.SkillPaths.Count > 0)
-            foreach (var item in options.SkillPaths)
+            foreach (string item in options.SkillPaths)
                 skills.Add(new AgentSkillsProvider(item, options: new AgentSkillsProviderOptions
                 {
                     DisableReadSkillResourceApproval = true,
                     DisableRunSkillScriptApproval = true,
                     DisableLoadSkillApproval = true,
                 }));
-        
+
         return _projectClient.AsAIAgent(
             new ChatClientAgentOptions
             {
@@ -39,9 +39,11 @@ public sealed class AgentFactory
                 ChatOptions = new()
                 {
                     ModelId = options.Model,
-                    Instructions = options.Instructions
+                    Instructions = options.Instructions,
+                    Tools = options?.Tools,
                 },
                 AIContextProviders = skills,
+
             }
         );
     }

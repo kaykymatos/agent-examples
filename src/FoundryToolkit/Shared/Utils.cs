@@ -1,7 +1,4 @@
 ﻿using Microsoft.Agents.AI;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FoundryToolkit.Shared
 {
@@ -21,8 +18,10 @@ namespace FoundryToolkit.Shared
                     continue;
                 }
 
-                await foreach (var update in agent.RunStreamingAsync(input, session))
+                Console.ForegroundColor = ConsoleColor.Green;
+                await foreach (AgentResponseUpdate update in agent.RunStreamingAsync(input, session))
                     Console.Write(update);
+                Console.ResetColor();
             }
         }
     }

@@ -7,7 +7,6 @@
 		<UserSecretsId>9b72bac6-a745-444a-b1c6-855729fd7c78</UserSecretsId>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Azure.AI.OpenAI" />
 		<PackageReference Include="Microsoft.Agents.AI.Foundry.Hosting" />
 		<PackageReference Include="Azure.AI.Projects" />
 		<PackageReference Include="DotNetEnv" />
